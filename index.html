@@ -7,104 +7,290 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;500;700&display=swap');
+
+/* ── VARIABLES ── */
 :root {
-  --g: #4ade80; --gd: #16a34a; --glow: rgba(74,222,128,0.12);
-  --bg: #090d0a; --bg2: #0f1610; --bg3: #141f15;
-  --bd: rgba(74,222,128,0.18); --bd2: rgba(74,222,128,0.32);
-  --tx: #dff0e2; --mut: #5a7a5e;
-  --mono: 'JetBrains Mono', monospace; --sans: 'Syne', sans-serif;
-  --sidebar: 260px; --rad: 10px;
+  --g: #4ade80;
+  --gd: #16a34a;
+  --glow: rgba(74,222,128,0.12);
+  --bg:  #090d0a;
+  --bg2: #0f1610;
+  --bg3: #141f15;
+  --bd:  rgba(74,222,128,0.18);
+  --bd2: rgba(74,222,128,0.32);
+  --tx:  #dff0e2;
+  --mut: #5a7a5e;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Syne', sans-serif;
+  --sidebar: 260px;
+  --rad: 10px;
 }
+
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
 body{background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:15px;}
+
+/* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
-#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem;}
-.auth-card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:400px;display:flex;flex-direction:column;gap:1.25rem;}
-.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:.5rem;}
-.auth-logo .logo-box{width:40px;height:40px;background:var(--gd);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:11px;color:var(--bg);box-shadow:0 0 18px var(--glow);letter-spacing:-.5px;}
+
+/* ══════════════════════════════
+   AUTH SCREEN
+══════════════════════════════ */
+#auth-screen {
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:1rem;
+}
+.auth-card {
+  background:var(--bg2);border:1px solid var(--bd);
+  border-radius:16px;padding:2.5rem 2rem;
+  width:100%;max-width:400px;
+  display:flex;flex-direction:column;gap:1.25rem;
+}
+.auth-logo {
+  display:flex;align-items:center;gap:10px;margin-bottom:.5rem;
+}
+.auth-logo .logo-box {
+  width:40px;height:40px;background:var(--gd);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:700;font-size:11px;color:var(--bg);
+  box-shadow:0 0 18px var(--glow);letter-spacing:-.5px;
+}
 .auth-logo h1{font-size:20px;font-weight:700;color:var(--g);}
 .auth-logo p{font-size:11px;color:var(--mut);font-family:var(--mono);}
+
 .auth-divider{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:12px;}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--bd);}
-.auth-btn{width:100%;padding:11px;border-radius:var(--rad);border:1px solid var(--bd);background:var(--bg3);color:var(--tx);font-size:14px;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .15s;font-weight:500;}
+
+.auth-btn {
+  width:100%;padding:11px;border-radius:var(--rad);
+  border:1px solid var(--bd);background:var(--bg3);
+  color:var(--tx);font-size:14px;font-family:var(--sans);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .15s;font-weight:500;
+}
 .auth-btn:hover{border-color:var(--bd2);background:var(--bg);}
 .auth-btn.primary{background:var(--gd);color:var(--bg);border-color:var(--gd);}
 .auth-btn.primary:hover{background:var(--g);}
-.auth-input{width:100%;padding:10px 14px;border-radius:var(--rad);border:1px solid var(--bd);background:var(--bg3);color:var(--tx);font-size:14px;font-family:var(--sans);}
+
+.auth-input {
+  width:100%;padding:10px 14px;border-radius:var(--rad);
+  border:1px solid var(--bd);background:var(--bg3);
+  color:var(--tx);font-size:14px;font-family:var(--sans);
+}
 .auth-input:focus{outline:none;border-color:var(--g);}
 .auth-input::placeholder{color:var(--mut);}
+
 .auth-switch{font-size:13px;color:var(--mut);text-align:center;}
 .auth-switch a{color:var(--g);cursor:pointer;text-decoration:none;}
+.auth-switch a:hover{text-decoration:underline;}
 .auth-error{font-size:12px;color:#f87171;font-family:var(--mono);display:none;}
-#app{display:none;height:100vh;flex-direction:row;}
-.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;height:100vh;transition:transform .25s;}
-.sidebar-header{padding:1rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;}
-.logo-box-sm{width:32px;height:32px;background:var(--gd);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:10px;color:var(--bg);flex-shrink:0;}
+
+/* ══════════════════════════════
+   APP LAYOUT
+══════════════════════════════ */
+#app {display:none;height:100vh;flex-direction:row;}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:var(--sidebar);min-width:var(--sidebar);
+  background:var(--bg2);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;height:100vh;
+  transition:transform .25s;
+}
+.sidebar-header {
+  padding:1rem;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:8px;
+}
+.logo-box-sm {
+  width:32px;height:32px;background:var(--gd);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:700;font-size:10px;color:var(--bg);flex-shrink:0;
+}
 .sidebar-title{font-size:15px;font-weight:700;color:var(--g);flex:1;}
-.new-chat-btn{margin:.75rem;padding:9px;border-radius:var(--rad);border:1px dashed var(--bd);background:transparent;color:var(--mut);font-size:13px;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;}
+#menu-toggle{
+  display:none;background:none;border:none;color:var(--mut);
+  font-size:20px;cursor:pointer;padding:4px;
+}
+
+.new-chat-btn {
+  margin:.75rem;padding:9px;border-radius:var(--rad);
+  border:1px dashed var(--bd);background:transparent;
+  color:var(--mut);font-size:13px;font-family:var(--sans);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .15s;
+}
 .new-chat-btn:hover{border-color:var(--g);color:var(--g);}
-.chats-label{padding:.25rem 1rem .5rem;font-size:10px;font-family:var(--mono);color:var(--mut);letter-spacing:.08em;text-transform:uppercase;}
+
+.chats-label{
+  padding:.25rem 1rem .5rem;
+  font-size:10px;font-family:var(--mono);color:var(--mut);letter-spacing:.08em;text-transform:uppercase;
+}
+
 .chat-list{flex:1;overflow-y:auto;padding:0 .5rem;}
-.chat-item{padding:9px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:2px;transition:background .12s;position:relative;}
+.chat-item {
+  padding:9px 10px;border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;gap:8px;margin-bottom:2px;
+  transition:background .12s;position:relative;
+}
 .chat-item:hover{background:var(--bg3);}
 .chat-item.active{background:var(--glow);border:1px solid var(--bd);}
 .chat-item-title{font-size:13px;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .chat-item-date{font-size:10px;color:var(--mut);font-family:var(--mono);white-space:nowrap;}
-.chat-delete{opacity:0;background:none;border:none;color:#f87171;font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:opacity .15s;}
+.chat-delete{
+  opacity:0;background:none;border:none;color:#f87171;
+  font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px;
+  transition:opacity .15s;
+}
 .chat-item:hover .chat-delete{opacity:1;}
-.sidebar-footer{padding:.75rem 1rem;border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px;}
-.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--g);flex-shrink:0;overflow:hidden;}
+
+.sidebar-footer{
+  padding:.75rem 1rem;border-top:1px solid var(--bd);
+  display:flex;align-items:center;gap:8px;
+}
+.user-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--g);flex-shrink:0;overflow:hidden;
+}
 .user-avatar img{width:100%;height:100%;object-fit:cover;}
 .user-name{font-size:13px;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-.logout-btn{background:none;border:none;color:var(--mut);font-size:16px;cursor:pointer;padding:4px;border-radius:4px;transition:color .15s;}
+.logout-btn{
+  background:none;border:none;color:var(--mut);
+  font-size:16px;cursor:pointer;padding:4px;border-radius:4px;
+  transition:color .15s;
+}
 .logout-btn:hover{color:#f87171;}
-.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
-.main-header{padding:.75rem 1rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-#hamburger{display:none;background:none;border:none;color:var(--mut);font-size:22px;cursor:pointer;padding:4px;}
-.conv-title-input{flex:1;background:none;border:none;color:var(--tx);font-size:15px;font-family:var(--sans);font-weight:500;min-width:0;}
+
+/* ── MAIN ── */
+.main {flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+.main-header {
+  padding:.75rem 1rem;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+#hamburger {
+  display:none;background:none;border:none;color:var(--mut);
+  font-size:22px;cursor:pointer;padding:4px;
+}
+.conv-title-input {
+  flex:1;background:none;border:none;color:var(--tx);
+  font-size:15px;font-family:var(--sans);font-weight:500;
+  min-width:0;
+}
 .conv-title-input:focus{outline:none;}
 .conv-title-input::placeholder{color:var(--mut);}
+
 .modes{display:flex;gap:5px;flex-wrap:wrap;}
-.mode-btn{padding:4px 12px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--mut);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all .12s;white-space:nowrap;}
+.mode-btn{
+  padding:4px 12px;border-radius:6px;
+  border:1px solid var(--bd);background:transparent;
+  color:var(--mut);font-size:11px;font-family:var(--mono);
+  cursor:pointer;transition:all .12s;white-space:nowrap;
+}
 .mode-btn:hover{color:var(--tx);border-color:var(--bd2);}
 .mode-btn.active{background:var(--glow);border-color:var(--g);color:var(--g);}
-.messages{flex:1;overflow-y:auto;padding:1.25rem 1rem;display:flex;flex-direction:column;gap:16px;}
-.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--mut);text-align:center;padding:2rem;}
+
+/* ── MESSAGES ── */
+.messages {
+  flex:1;overflow-y:auto;padding:1.25rem 1rem;
+  display:flex;flex-direction:column;gap:16px;
+}
+.empty-state{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;
+  color:var(--mut);text-align:center;padding:2rem;
+}
 .empty-state .big{font-size:32px;}
 .empty-state p{font-size:13px;font-family:var(--mono);}
+
 .msg{display:flex;gap:10px;align-items:flex-start;animation:fadeUp .2s ease;}
 .msg.user{flex-direction:row-reverse;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.av{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;}
+
+.av{
+  width:30px;height:30px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;
+}
 .av.ai{background:var(--gd);color:var(--bg);box-shadow:0 0 12px var(--glow);}
 .av.user{background:var(--bg3);color:var(--mut);border:1px solid var(--bd);}
-.bubble{max-width:78%;padding:10px 14px;font-size:14px;line-height:1.65;}
-.msg.ai .bubble{background:var(--bg3);border:1px solid var(--bd);border-radius:4px 10px 10px 10px;color:var(--tx);}
-.msg.user .bubble{background:var(--gd);color:var(--bg);font-weight:500;border-radius:10px 4px 10px 10px;}
-.bubble pre{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px 12px;overflow-x:auto;font-size:12px;font-family:var(--mono);margin:8px 0;color:var(--g);white-space:pre-wrap;}
+
+.bubble{
+  max-width:78%;padding:10px 14px;
+  font-size:14px;line-height:1.65;
+}
+.msg.ai .bubble{
+  background:var(--bg3);border:1px solid var(--bd);
+  border-radius:4px 10px 10px 10px;color:var(--tx);
+}
+.msg.user .bubble{
+  background:var(--gd);color:var(--bg);font-weight:500;
+  border-radius:10px 4px 10px 10px;
+}
+.bubble pre{
+  background:var(--bg);border:1px solid var(--bd);border-radius:6px;
+  padding:10px 12px;overflow-x:auto;font-size:12px;
+  font-family:var(--mono);margin:8px 0;color:var(--g);
+  white-space:pre-wrap;
+}
 .bubble strong{color:var(--g);}
+
+/* typing */
 .typing-dots{display:flex;gap:5px;padding:4px 0;}
-.typing-dots span{width:7px;height:7px;background:var(--g);border-radius:50%;animation:bounce 1.2s infinite;opacity:.5;}
+.typing-dots span{
+  width:7px;height:7px;background:var(--g);border-radius:50%;
+  animation:bounce 1.2s infinite;opacity:.5;
+}
 .typing-dots span:nth-child(2){animation-delay:.2s;}
 .typing-dots span:nth-child(3){animation-delay:.4s;}
 @keyframes bounce{0%,60%,100%{transform:scale(1);opacity:.5}30%{transform:scale(1.3);opacity:1}}
-.input-area{padding:.75rem 1rem;border-top:1px solid var(--bd);display:flex;gap:8px;align-items:flex-end;}
-#userInput{flex:1;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:10px 14px;color:var(--tx);font-size:14px;font-family:var(--sans);resize:none;min-height:42px;max-height:120px;line-height:1.5;transition:border-color .15s;}
+
+/* ── INPUT ── */
+.input-area{
+  padding:.75rem 1rem;border-top:1px solid var(--bd);
+  display:flex;gap:8px;align-items:flex-end;
+}
+#userInput{
+  flex:1;background:var(--bg2);border:1px solid var(--bd);
+  border-radius:var(--rad);padding:10px 14px;
+  color:var(--tx);font-size:14px;font-family:var(--sans);
+  resize:none;min-height:42px;max-height:120px;
+  line-height:1.5;transition:border-color .15s;
+}
 #userInput:focus{outline:none;border-color:var(--g);}
 #userInput::placeholder{color:var(--mut);}
-#sendBtn{padding:10px 18px;background:var(--gd);color:var(--bg);border:none;border-radius:var(--rad);font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;transition:all .15s;white-space:nowrap;height:42px;}
+#sendBtn{
+  padding:10px 18px;background:var(--gd);color:var(--bg);
+  border:none;border-radius:var(--rad);font-size:14px;
+  font-weight:700;font-family:var(--sans);cursor:pointer;
+  transition:all .15s;white-space:nowrap;height:42px;
+}
 #sendBtn:hover{background:var(--g);}
 #sendBtn:disabled{opacity:.4;cursor:not-allowed;}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10;}
+
+/* ── OVERLAY (mobile) ── */
+.overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10;
+}
+
+/* ══════════════════════════════
+   RESPONSIVE — MÓVIL
+══════════════════════════════ */
 @media(max-width:640px){
   :root{--sidebar:80vw;}
+
   #hamburger{display:block;}
-  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:20;transform:translateX(-100%);}
+
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;z-index:20;
+    transform:translateX(-100%);
+  }
   .sidebar.open{transform:translateX(0);}
   .overlay.open{display:block;}
+
   .main-header{gap:6px;}
   .modes .mode-btn{font-size:10px;padding:3px 9px;}
   .bubble{max-width:88%;}
@@ -113,43 +299,66 @@ body{background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:15px
 </style>
 </head>
 <body>
+
+<!-- ══════════════════════════════
+     AUTH SCREEN
+══════════════════════════════ -->
 <div id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">
       <div class="logo-box">MC<br>OS</div>
-      <div><h1>MC Creator OS</h1><p>programación · noticias · video</p></div>
+      <div>
+        <h1>MC Creator OS</h1>
+        <p>programación · noticias · video</p>
+      </div>
     </div>
+
+    <!-- OAuth -->
     <button class="auth-btn" onclick="loginOAuth('github')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
       Continuar con GitHub
     </button>
+
     <div class="auth-divider">o con email</div>
+
+    <!-- Email form -->
     <div id="auth-form" style="display:flex;flex-direction:column;gap:.75rem;">
       <input class="auth-input" type="email" id="email" placeholder="tu@email.com">
       <input class="auth-input" type="password" id="password" placeholder="Contraseña">
       <div class="auth-error" id="auth-error"></div>
       <button class="auth-btn primary" onclick="loginEmail()" id="login-btn">Entrar</button>
-      <div class="auth-switch">¿Sin cuenta? <a onclick="toggleRegister()">Regístrate</a></div>
+      <div class="auth-switch">
+        ¿Sin cuenta? <a onclick="toggleRegister()">Regístrate</a>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- ══════════════════════════════
+     APP
+══════════════════════════════ -->
 <div id="app">
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo-box-sm">MC</div>
       <span class="sidebar-title">MC Creator OS</span>
     </div>
+
     <button class="new-chat-btn" onclick="newConversation()">+ Nueva conversación</button>
     <div class="chats-label">Historial</div>
     <div class="chat-list" id="chat-list"></div>
+
     <div class="sidebar-footer">
       <div class="user-avatar" id="user-avatar"></div>
       <span class="user-name" id="user-name"></span>
       <button class="logout-btn" onclick="logout()" title="Cerrar sesión">⏻</button>
     </div>
   </div>
+
+  <!-- Main -->
   <div class="main">
     <div class="main-header">
       <button id="hamburger" onclick="openSidebar()">☰</button>
@@ -162,12 +371,14 @@ body{background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:15px
         <button class="mode-btn" onclick="setMode('video')" id="btn-video">🎬 Video</button>
       </div>
     </div>
+
     <div class="messages" id="messages">
       <div class="empty-state" id="empty-state">
         <div class="big">⛏️</div>
         <p>Nueva conversación.<br>¿Qué necesitas crear hoy?</p>
       </div>
     </div>
+
     <div class="input-area">
       <textarea id="userInput" placeholder="Escribe tu petición..." rows="1"
         onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
@@ -177,200 +388,368 @@ body{background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:15px
 </div>
 
 <script>
-// ══ CAMBIA ESTOS 3 VALORES ══
+// ══════════════════════════════════════════════
+// CONFIGURACIÓN — CAMBIA ESTOS VALORES
+// ══════════════════════════════════════════════
 const SUPABASE_URL = 'https://TU_PROYECTO.supabase.co';
 const SUPABASE_ANON_KEY = 'TU_ANON_KEY';
-const GROQ_API_KEY = 'PON_AQUI_TU_GROQ_KEY';
 
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let currentUser=null,currentConvId=null,currentMode='auto',isRegister=false;
 
-sb.auth.onAuthStateChange(async(event,session)=>{
-  if(session?.user){currentUser=session.user;showApp();}
-  else{currentUser=null;showAuth();}
+let currentUser = null;
+let currentConvId = null;
+let currentMode = 'auto';
+let isRegister = false;
+
+// ══════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session?.user) {
+    currentUser = session.user;
+    showApp();
+  } else {
+    currentUser = null;
+    showAuth();
+  }
 });
 
-async function loginOAuth(provider){
-  const{error}=await sb.auth.signInWithOAuth({provider,options:{redirectTo:window.location.href}});
-  if(error)showError(error.message);
-}
-async function loginEmail(){
-  const email=document.getElementById('email').value.trim();
-  const pass=document.getElementById('password').value;
-  if(!email||!pass)return showError('Rellena email y contraseña.');
-  const fn=isRegister?sb.auth.signUp({email,password:pass}):sb.auth.signInWithPassword({email,password:pass});
-  const{error}=await fn;
-  if(error)showError(error.message);
-  else if(isRegister)showError('✅ Revisa tu email para confirmar.');
-}
-function toggleRegister(){
-  isRegister=!isRegister;
-  document.getElementById('login-btn').textContent=isRegister?'Registrarse':'Entrar';
-  document.querySelector('.auth-switch').innerHTML=isRegister
-    ?'¿Ya tienes cuenta? <a onclick="toggleRegister()">Entra aquí</a>'
-    :'¿Sin cuenta? <a onclick="toggleRegister()">Regístrate</a>';
-}
-async function logout(){await sb.auth.signOut();}
-function showError(msg){
-  const el=document.getElementById('auth-error');
-  el.textContent=msg;el.style.display='block';
-  setTimeout(()=>el.style.display='none',4000);
+async function loginOAuth(provider) {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: window.location.href }
+  });
+  if (error) showError(error.message);
 }
 
-async function showApp(){
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
-  const meta=currentUser.user_metadata;
-  const name=meta?.full_name||meta?.name||currentUser.email?.split('@')[0]||'User';
-  document.getElementById('user-name').textContent=name;
-  const av=document.getElementById('user-avatar');
-  if(meta?.avatar_url)av.innerHTML=`<img src="${meta.avatar_url}" alt="">`;
-  else av.textContent=name[0].toUpperCase();
+async function loginEmail() {
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('password').value;
+  if (!email || !pass) return showError('Rellena email y contraseña.');
+
+  const fn = isRegister
+    ? sb.auth.signUp({ email, password: pass })
+    : sb.auth.signInWithPassword({ email, password: pass });
+
+  const { error } = await fn;
+  if (error) showError(error.message);
+  else if (isRegister) showError('✅ Revisa tu email para confirmar.');
+}
+
+function toggleRegister() {
+  isRegister = !isRegister;
+  document.getElementById('login-btn').textContent = isRegister ? 'Registrarse' : 'Entrar';
+  document.querySelector('.auth-switch').innerHTML = isRegister
+    ? '¿Ya tienes cuenta? <a onclick="toggleRegister()">Entra aquí</a>'
+    : '¿Sin cuenta? <a onclick="toggleRegister()">Regístrate</a>';
+}
+
+async function logout() {
+  await sb.auth.signOut();
+}
+
+function showError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// ══════════════════════════════════════════════
+// APP INIT
+// ══════════════════════════════════════════════
+async function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+
+  // Avatar/nombre
+  const meta = currentUser.user_metadata;
+  const name = meta?.full_name || meta?.name || currentUser.email?.split('@')[0] || 'User';
+  document.getElementById('user-name').textContent = name;
+  const av = document.getElementById('user-avatar');
+  if (meta?.avatar_url) {
+    av.innerHTML = `<img src="${meta.avatar_url}" alt="">`;
+  } else {
+    av.textContent = name[0].toUpperCase();
+  }
+
   await loadConversations();
 }
-function showAuth(){
-  document.getElementById('auth-screen').style.display='flex';
-  document.getElementById('app').style.display='none';
+
+function showAuth() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
 }
 
-async function loadConversations(){
-  const{data}=await sb.from('conversations').select('id,title,mode,updated_at')
-    .eq('user_id',currentUser.id).order('updated_at',{ascending:false}).limit(50);
-  renderChatList(data||[]);
+// ══════════════════════════════════════════════
+// CONVERSACIONES
+// ══════════════════════════════════════════════
+async function loadConversations() {
+  const { data } = await sb.from('conversations')
+    .select('id,title,mode,updated_at')
+    .eq('user_id', currentUser.id)
+    .order('updated_at', { ascending: false })
+    .limit(50);
+
+  renderChatList(data || []);
 }
-function renderChatList(convs){
-  const list=document.getElementById('chat-list');
-  list.innerHTML='';
-  convs.forEach(c=>{
-    const div=document.createElement('div');
-    div.className='chat-item'+(c.id===currentConvId?' active':'');
-    div.dataset.id=c.id;
-    const d=new Date(c.updated_at);
-    const dateStr=d.toLocaleDateString('es',{day:'numeric',month:'short'});
-    div.innerHTML=`<span class="chat-item-title">${c.title}</span><span class="chat-item-date">${dateStr}</span><button class="chat-delete" onclick="deleteConv(event,'${c.id}')">✕</button>`;
-    div.addEventListener('click',()=>openConversation(c.id,c.title,c.mode));
+
+function renderChatList(convs) {
+  const list = document.getElementById('chat-list');
+  list.innerHTML = '';
+  convs.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'chat-item' + (c.id === currentConvId ? ' active' : '');
+    div.dataset.id = c.id;
+    const d = new Date(c.updated_at);
+    const dateStr = d.toLocaleDateString('es', { day:'numeric', month:'short' });
+    div.innerHTML = `
+      <span class="chat-item-title">${c.title}</span>
+      <span class="chat-item-date">${dateStr}</span>
+      <button class="chat-delete" onclick="deleteConv(event,'${c.id}')">✕</button>
+    `;
+    div.addEventListener('click', () => openConversation(c.id, c.title, c.mode));
     list.appendChild(div);
   });
 }
-async function newConversation(){
-  currentConvId=null;currentMode='auto';setMode('auto');
-  document.getElementById('conv-title').value='';
-  document.getElementById('messages').innerHTML='<div class="empty-state" id="empty-state"><div class="big">⛏️</div><p>Nueva conversación.<br>¿Qué necesitas crear hoy?</p></div>';
-  closeSidebar();document.getElementById('userInput').focus();
-}
-async function openConversation(id,title,mode){
-  currentConvId=id;
-  document.getElementById('conv-title').value=title;
-  setMode(mode||'auto');
-  const{data}=await sb.from('messages').select('role,content').eq('conversation_id',id).order('created_at',{ascending:true});
-  const msgsEl=document.getElementById('messages');
-  msgsEl.innerHTML='';
-  (data||[]).forEach(m=>addMsgDOM(m.role,formatReply(m.content)));
-  msgsEl.scrollTop=msgsEl.scrollHeight;
-  document.querySelectorAll('.chat-item').forEach(el=>el.classList.toggle('active',el.dataset.id===id));
+
+async function newConversation() {
+  currentConvId = null;
+  currentMode = 'auto';
+  setMode('auto');
+  document.getElementById('conv-title').value = '';
+  document.getElementById('messages').innerHTML = `
+    <div class="empty-state" id="empty-state">
+      <div class="big">⛏️</div>
+      <p>Nueva conversación.<br>¿Qué necesitas crear hoy?</p>
+    </div>`;
   closeSidebar();
-}
-async function deleteConv(e,id){
-  e.stopPropagation();
-  await sb.from('conversations').delete().eq('id',id);
-  if(currentConvId===id)newConversation();
-  await loadConversations();
-}
-async function saveTitle(){
-  if(!currentConvId)return;
-  const title=document.getElementById('conv-title').value.trim()||'Sin título';
-  await sb.from('conversations').update({title}).eq('id',currentConvId);
-  await loadConversations();
-}
-
-function setMode(mode){
-  currentMode=mode;
-  ['auto','code','news','video'].forEach(m=>document.getElementById('btn-'+m)?.classList.toggle('active',m===mode));
-}
-function getModeExtra(){
-  const map={code:'\nMODO ACTIVO: PROGRAMACIÓN.',news:'\nMODO ACTIVO: NOTICIA SEO.',video:'\nMODO ACTIVO: IDEAS VIDEO.',auto:''};
-  return map[currentMode]||'';
-}
-
-const SYSTEM_BASE=`Eres MC Creator OS, asistente todo-en-uno para creadores de Minecraft en español.
-Resuelves: programación de mods, noticias SEO e ideas de video.
-REGLAS: Responde en español directo, sin relleno.
-PROGRAMACIÓN: código funcional con comentarios. Si hay error: causa + 2 soluciones.
-NOTICIA SEO: titular viral, párrafo gancho, 3-4 H2, CTA. 400-600 palabras, 3 keywords. No inventes datos.
-IDEAS VIDEO: 10 ideas con título <60 chars, hook 3s, estructura 3 partes, por qué funciona, thumbnail. 1 idea polémica.`;
-
-async function sendMessage(){
-  const input=document.getElementById('userInput');
-  const text=input.value.trim();
-  if(!text)return;
-  input.value='';autoResize(input);
-  document.getElementById('empty-state')?.remove();
-  addMsgDOM('user',text);
-  document.getElementById('sendBtn').disabled=true;
-  if(!currentConvId){
-    const title=text.slice(0,50);
-    const{data}=await sb.from('conversations').insert({user_id:currentUser.id,title,mode:currentMode}).select().single();
-    if(data){currentConvId=data.id;document.getElementById('conv-title').value=title;await loadConversations();}
-  }
-  await sb.from('messages').insert({conversation_id:currentConvId,role:'user',content:text});
-  const{data:history}=await sb.from('messages').select('role,content').eq('conversation_id',currentConvId).order('created_at',{ascending:true}).limit(20);
-  const typingId='typing-'+Date.now();
-  addTyping(typingId);
-  try{
-    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_API_KEY},
-      body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
-        max_tokens:1000,
-        messages:[
-          {role:'system',content:SYSTEM_BASE+getModeExtra()},
-          ...(history||[]).map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))
-        ]
-      })
-    });
-    const data=await res.json();
-    document.getElementById(typingId)?.remove();
-    const reply=data.choices?.[0]?.message?.content||'Sin respuesta.';
-    addMsgDOM('ai',formatReply(reply));
-    await sb.from('messages').insert({conversation_id:currentConvId,role:'assistant',content:reply});
-    await sb.from('conversations').update({updated_at:new Date().toISOString()}).eq('id',currentConvId);
-    await loadConversations();
-  }catch(e){
-    document.getElementById(typingId)?.remove();
-    addMsgDOM('ai','⚠️ Error de conexión. Inténtalo de nuevo.');
-  }
-  document.getElementById('sendBtn').disabled=false;
   document.getElementById('userInput').focus();
 }
 
-function addMsgDOM(role,html){
-  const msgs=document.getElementById('messages');
-  const div=document.createElement('div');
-  div.className='msg '+(role==='user'?'user':'ai');
-  const av=document.createElement('div');
-  av.className='av '+(role==='user'?'user':'ai');
-  av.textContent=role==='user'?'Tú':'MC';
-  const bubble=document.createElement('div');
-  bubble.className='bubble';bubble.innerHTML=html;
-  div.appendChild(av);div.appendChild(bubble);
-  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+async function openConversation(id, title, mode) {
+  currentConvId = id;
+  document.getElementById('conv-title').value = title;
+  setMode(mode || 'auto');
+
+  const { data } = await sb.from('messages')
+    .select('role,content')
+    .eq('conversation_id', id)
+    .order('created_at', { ascending: true });
+
+  const msgsEl = document.getElementById('messages');
+  msgsEl.innerHTML = '';
+
+  (data || []).forEach(m => addMsgDOM(m.role, formatReply(m.content)));
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+
+  // Marcar activo en sidebar
+  document.querySelectorAll('.chat-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === id);
+  });
+
+  closeSidebar();
 }
-function addTyping(id){
-  const msgs=document.getElementById('messages');
-  const div=document.createElement('div');
-  div.className='msg ai';div.id=id;
-  div.innerHTML='<div class="av ai">MC</div><div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
-  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+
+async function deleteConv(e, id) {
+  e.stopPropagation();
+  await sb.from('conversations').delete().eq('id', id);
+  if (currentConvId === id) newConversation();
+  await loadConversations();
 }
-function formatReply(text){
-  return text.replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre>$2</pre>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+
+async function saveTitle() {
+  if (!currentConvId) return;
+  const title = document.getElementById('conv-title').value.trim() || 'Sin título';
+  await sb.from('conversations').update({ title }).eq('id', currentConvId);
+  await loadConversations();
 }
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
-function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+
+// ══════════════════════════════════════════════
+// MODO
+// ══════════════════════════════════════════════
+function setMode(mode) {
+  currentMode = mode;
+  ['auto','code','news','video'].forEach(m => {
+    document.getElementById('btn-'+m)?.classList.toggle('active', m === mode);
+  });
+}
+
+function getModeExtra() {
+  const map = {
+    code: '\nMODO ACTIVO: PROGRAMACIÓN. Da código funcional con comentarios clave.',
+    news: '\nMODO ACTIVO: NOTICIA SEO. Usa la estructura obligatoria: titular, gancho, H2s, CTA.',
+    video: '\nMODO ACTIVO: IDEAS VIDEO. Da 10 ideas con formato completo.',
+    auto: ''
+  };
+  return map[currentMode] || '';
+}
+
+// ══════════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════════
+const SYSTEM_BASE = `Eres MC Creator OS, asistente todo-en-uno para creadores de Minecraft en español.
+Resuelves: programación de mods, noticias SEO e ideas de video.
+
+REGLAS: Responde en español directo, sin relleno. Detecta qué necesita el usuario.
+
+MODO PROGRAMACIÓN: código funcional con comentarios. Bloques de código + explicación corta.
+Si hay error: causa + 2 soluciones (rápida y correcta).
+
+MODO NOTICIA SEO: 1) Titular viral con keyword 2) Párrafo gancho 3) 3-4 subtítulos H2 4) CTA "¿Qué opinas?".
+400-600 palabras, 3 keywords al final. No inventes datos.
+
+MODO IDEAS VIDEO: 10 ideas con título viral <60 chars, hook 3s, estructura 3 partes, por qué funciona, thumbnail.
+Incluye 1 idea polémica. Prioriza Minecraft 1.20+.
+
+ESTILO: Sin rodeos. Directo al resultado.`;
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  autoResize(input);
+
+  // Quitar empty state
+  document.getElementById('empty-state')?.remove();
+
+  addMsgDOM('user', text);
+  document.getElementById('sendBtn').disabled = true;
+
+  // Crear conversación si no existe
+  if (!currentConvId) {
+    const title = text.slice(0, 50);
+    const { data } = await sb.from('conversations').insert({
+      user_id: currentUser.id,
+      title,
+      mode: currentMode
+    }).select().single();
+    if (data) {
+      currentConvId = data.id;
+      document.getElementById('conv-title').value = title;
+      await loadConversations();
+    }
+  }
+
+  // Guardar mensaje usuario
+  await sb.from('messages').insert({
+    conversation_id: currentConvId,
+    role: 'user',
+    content: text
+  });
+
+  // Historial para context (últimos 20 msgs)
+  const { data: history } = await sb.from('messages')
+    .select('role,content')
+    .eq('conversation_id', currentConvId)
+    .order('created_at', { ascending: true })
+    .limit(20);
+
+  // Typing
+  const typingId = 'typing-' + Date.now();
+  addTyping(typingId);
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1000,
+        messages: [
+          { role: 'system', content: SYSTEM_BASE + getModeExtra() },
+          ...(history || []).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }))
+        ]
+      })
+    });
+
+    const data = await res.json();
+    document.getElementById(typingId)?.remove();
+
+    const reply = data.choices?.[0]?.message?.content || 'Sin respuesta.';
+    addMsgDOM('ai', formatReply(reply));
+
+    // Guardar respuesta
+    await sb.from('messages').insert({
+      conversation_id: currentConvId,
+      role: 'assistant',
+      content: reply
+    });
+
+    // Actualizar updated_at
+    await sb.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', currentConvId);
+    await loadConversations();
+
+  } catch(e) {
+    document.getElementById(typingId)?.remove();
+    addMsgDOM('ai', '⚠️ Error de conexión. Inténtalo de nuevo.');
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('userInput').focus();
+}
+
+function addMsgDOM(role, html) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
+  const av = document.createElement('div');
+  av.className = 'av ' + (role === 'user' ? 'user' : 'ai');
+  av.textContent = role === 'user' ? 'Tú' : 'MC';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = html;
+  div.appendChild(av);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping(id) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = id;
+  div.innerHTML = '<div class="av ai">MC</div><div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function formatReply(text) {
+  return text
+    .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre>$2</pre>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+// ══════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
 </script>
 </body>
 </html>
